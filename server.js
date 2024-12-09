@@ -1,93 +1,76 @@
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose'); // Import mongoose
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware to enable CORS (optional)
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
+// Middleware to enable CORS
+app.use(cors());
 
-// Endpoint to get JSON data by file name
-app.get('/api/metadata/flarecatsgang/:id', (req, res) => {
-    const id = req.params.id; // Get the filename from the request parameters
-    const filePath = path.join(__dirname, 'assets/flarecatsgang/json', `${id}.json`); // Construct the full path to the file
+// Connect to MongoDB
+mongoose.connect('mongodb+srv://flarecatsclub:Skdmltjdrhd92@@cluster0.vlnze.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', { // Replace with your MongoDB connection string
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+.then(() => console.log('MongoDB connected...'))
+.catch(err => console.error('MongoDB connection error:', err));
 
-    // Check if the file exists
-    fs.access(filePath, fs.constants.F_OK, (err) => {
-        if (err) {
+// Define a Mongoose schema for your data
+const FlareCatsGangSchema = new mongoose.Schema({}, { collection: 'flarecatsgang' }); // Adjust the collection name if necessary
+const FlareCuteCatsSchema = new mongoose.Schema({}, { collection: 'flarecutecats' });
+
+const FlareCatsGang = mongoose.model('FlareCatsGang', FlareCatsGangSchema);
+const FlareCuteCats = mongoose.model('FlareCuteCats', FlareCuteCatsSchema);
+
+// Endpoint to get JSON data for FlareCatsGang by ID
+app.get('/api/metadata/flarecatsgang/:id', async (req, res) => {
+    const id = req.params.id; // Get the ID from the request parameters
+
+    try {
+        const data = await FlareCatsGang.findById(id).exec(); // Fetch data from MongoDB
+        if (!data) {
             return res.status(404).json({ error: 'File not found' });
         }
-
-        // Read and return the contents of the JSON file
-        fs.readFile(filePath, 'utf8', (err, data) => {
-            if (err) {
-                return res.status(500).json({ error: 'Failed to read file' });
-            }
-
-            try {
-                const jsonData = JSON.parse(data); // Parse the file contents as JSON
-                res.json(jsonData); // Send the data in the response
-            } catch (parseError) {
-                res.status(500).json({ error: 'Error parsing JSON' });
-            }
-        });
-    });
+        res.json(data); // Send the data in the response
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to retrieve data from database' });
+    }
 });
 
-app.get('/api/image/flarecatsgang/:id', (req, res) => {
+// Endpoint to get images for FlareCatsGang by ID
+app.get('/api/image/flarecatsgang/:id', async (req, res) => {
     const id = req.params.id; // Get the filename from the request parameters
-    const filePath = path.join(__dirname, 'assets/flarecatsgang/image', `${id}.png`); // Construct the full path to the file
-
-    // Check if the file exists
-    fs.access(filePath, fs.constants.F_OK, (err) => {
-        if (err) {
+    
+    // Assuming the image URL is stored in the MongoDB document,
+    // adjust according to your data structure
+    try {
+        const data = await FlareCatsGang.findById(id).exec();
+        if (!data || !data.imageUrl) {
             return res.status(404).json({ error: 'File not found' });
         }
-
-        // Read and return the contents of the JSON file
-        fs.readFile(filePath, 'utf8', (err, data) => {
-            if (err) {
-                return res.status(500).json({ error: 'Failed to read file' });
-            }
-
-            try {
-                res.sendFile(filePath);
-            } catch (parseError) {
-                res.status(500).json({ error: 'Error parsing JSON' });
-            }
-        });
-    });
+        res.sendFile(data.imageUrl); // Serve the image
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to retrieve image from database' });
+    }
 });
 
-app.get('/api/metadata/flarecutecats/:id', (req, res) => {
-    const id = req.params.id; // Get the filename from the request parameters
-    const filePath = path.join(__dirname, 'assets/flarecutecats/json', `${id}.json`); // Construct the full path to the file
-
-    // Check if the file exists
-    fs.access(filePath, fs.constants.F_OK, (err) => {
-        if (err) {
+// Endpoint to get JSON data for FlareCuteCats by ID
+app.get('/api/metadata/flarecutecats/:id', async (req, res) => {
+    const id = req.params.id; // Get the ID from the request parameters
+    
+    try {
+        const data = await FlareCuteCats.findById(id).exec(); // Fetch data from MongoDB
+        if (!data) {
             return res.status(404).json({ error: 'File not found' });
         }
-
-        // Read and return the contents of the JSON file
-        fs.readFile(filePath, 'utf8', (err, data) => {
-            if (err) {
-                return res.status(500).json({ error: 'Failed to read file' });
-            }
-
-            try {
-                const jsonData = JSON.parse(data); // Parse the file contents as JSON
-                res.json(jsonData); // Send the data in the response
-            } catch (parseError) {
-                res.status(500).json({ error: 'Error parsing JSON' });
-            }
-        });
-    });
+        res.json(data); // Send the data in the response
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to retrieve data from database' });
+    }
 });
 
 // Start the server
