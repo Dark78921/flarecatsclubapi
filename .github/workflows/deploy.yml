@@ -35,4 +35,4 @@ jobs:
       - name: Deploy to Firebase Hosting
         env:
             FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}  # Set this in your GitHub secrets
-        run: firebase deploy --only hosting
+        run: firebase deploy --only hosting, functions
