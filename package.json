@@ -20,8 +20,8 @@
   },
   "homepage": "https://github.com/Dark78921/fcg-meta#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.21.2",
-    "mongoose": "^6.0.12",
-    "cors": "^2.8.5"
+    "mongoose": "^6.0.12"
   }
 }

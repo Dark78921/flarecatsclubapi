@@ -12,5 +12,13 @@
       ],
       "predeploy": []
     }
-  ]
+  ],
+  "hosting": {
+    "public": "functions",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
 }

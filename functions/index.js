@@ -1,15 +1,13 @@
+const functions = require('firebase-functions');
 const express = require('express');
-const mongoose = require('mongoose'); // Import mongoose
-const cors = require('cors');
 
+// Initialize the Express app
 const app = express();
-const PORT = process.env.PORT || 5000;
-
-// Middleware to enable CORS
-app.use(cors());
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://flarecatsclub:Skdmltjdrhd92@@cluster0.vlnze.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', { // Replace with your MongoDB connection string
+const dbURI = process.env.MONGODB_URI;
+mongoose.connect(dbURI, {
+
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
@@ -73,7 +71,5 @@ app.get('/metadata/flarecutecats/:id', async (req, res) => {
     }
 });
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Expose the Express app as a Cloud Function
+exports.api = functions.https.onRequest(app);
