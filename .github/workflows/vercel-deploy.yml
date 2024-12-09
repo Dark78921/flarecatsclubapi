@@ -1,0 +1,29 @@
+name: Deploy to Vercel
+
+on:
+  push:
+    branches:
+      - main  # Update with your main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3  # Use the latest version
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3  # Use the latest version
+        with:
+          node-version: '16'  # Set the Node.js version
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Deploy to Vercel
+        uses: vercel/vercel-action@v2.0.1  # Use the latest version
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'  # Use for production deployment
