@@ -9,7 +9,9 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://flarecatsclub:Skdmltjdrhd92@@cluster0.vlnze.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', { // Replace with your MongoDB connection string
+const dbURI = process.env.MONGODB_URI;
+mongoose.connect(dbURI, {
+
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
